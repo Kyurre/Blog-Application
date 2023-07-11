@@ -1,6 +1,6 @@
 # Blog-Application
-Backend Implementation of a Blog Application. The project follows proper java and RESTAPI principles by creating services and controllers to get information. 
-### Tech Stack: Maven, SpringBoot, Postgres, CRUD
+Backend Implementation of a Blog Application.  
+### Tech Stack: Maven, SpringBoot, Postgres, CRUD, RESTAPI
 
 Features 
   - CRUD Users, Posts, and Categories
