@@ -2,15 +2,22 @@ package com.application.blog.models;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 @Entity
 @Table(name="posts")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Post {
 
     // Category ID
     @ManyToOne
+    @JoinColumn(name="categoryId", nullable = false)
     private Category category;
 
     // UserID
