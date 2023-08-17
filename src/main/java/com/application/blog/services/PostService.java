@@ -2,6 +2,7 @@ package com.application.blog.services;
 
 import com.application.blog.models.Post;
 import com.application.blog.payloads.PostDto;
+import com.application.blog.payloads.PostResponse;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface PostService {
     PostDto updatePost(PostDto postDto, Integer postId);
 
     // Get all post
-    List<PostDto> getAllPost();
+    PostResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
     // Get post by post id
     PostDto getPostById(Integer postId);
@@ -28,5 +29,5 @@ public interface PostService {
     // Get all post by user
     List<PostDto> getPostsByUser(Integer userId);
 
-
+    List<PostDto> searchPosts(String keyword);
 }

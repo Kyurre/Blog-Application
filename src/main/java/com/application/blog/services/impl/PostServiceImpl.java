@@ -6,12 +6,17 @@ import com.application.blog.models.Post;
 import com.application.blog.models.User;
 import com.application.blog.payloads.CategoryDto;
 import com.application.blog.payloads.PostDto;
+import com.application.blog.payloads.PostResponse;
 import com.application.blog.repositories.CategoryRepo;
 import com.application.blog.repositories.PostRepo;
 import com.application.blog.repositories.UserRepo;
 import com.application.blog.services.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -52,6 +57,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "PostID", postId));
         this.postRepo.delete(post);
+        // TODO: add logic to remove image when the post is deleted
     }
 
     @Override
@@ -59,16 +65,33 @@ public class PostServiceImpl implements PostService {
         Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "PostID", postId));
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
+        post.setImageName(postDto.getImageName());
 
         Post updated = this.postRepo.save(post);
         return this.modelMapper.map(updated, PostDto.class);
     }
 
     @Override
-    public List<PostDto> getAllPost() {
-        List<Post> post = this.postRepo.findAll();
-        List<PostDto> postDto = post.stream().map((posts) -> this.modelMapper.map(posts, PostDto.class)).collect(Collectors.toList());
-        return postDto;
+    public PostResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+
+        Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable p = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Post> pagePost = this.postRepo.findAll(p);
+        List<Post> allPosts = pagePost.getContent();
+
+        List<PostDto> postDto = allPosts.stream().map((posts) -> this.modelMapper.map(posts, PostDto.class)).collect(Collectors.toList());
+
+        // Creating return variable
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(postDto);
+        postResponse.setPageNumber(pagePost.getNumber());
+        postResponse.setPageSize(pagePost.getSize());
+        postResponse.setTotalPages(pagePost.getTotalPages());
+        postResponse.setTotalElement(pagePost.getTotalElements());
+        postResponse.setLastPage(pagePost.isLast());
+
+        return postResponse;
     }
 
     @Override
@@ -105,4 +128,26 @@ public class PostServiceImpl implements PostService {
 
         return postDtoList;
     }
+
+    @Override
+    public List<PostDto> searchPosts(String keyword) {
+
+        List<Post> posts = this.postRepo.findByTitleContaining(keyword);
+        List<PostDto> postDtos = posts.stream().map((post)->this.modelMapper.map(post,PostDto.class)).collect(Collectors.toList());
+        return postDtos;
+    }
+
+    /*
+
+    Using query method add "%" in front of the keyword
+
+    @Override
+    public List<PostDto> searchPosts(String keyword) {
+
+        List<Post> posts = this.postRepo.findByTitleContaining("%"+keyword+"%");
+        List<PostDto> postDtos = posts.stream().map((post)->this.modelMapper.map(post,PostDto.class)).collect(Collectors.toList());
+        return postDtos;
+    }
+
+     */
 }
