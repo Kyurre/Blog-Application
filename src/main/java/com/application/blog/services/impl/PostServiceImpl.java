@@ -4,7 +4,6 @@ import com.application.blog.exceptions.ResourceNotFoundException;
 import com.application.blog.models.Category;
 import com.application.blog.models.Post;
 import com.application.blog.models.User;
-import com.application.blog.payloads.CategoryDto;
 import com.application.blog.payloads.PostDto;
 import com.application.blog.payloads.PostResponse;
 import com.application.blog.repositories.CategoryRepo;
@@ -57,7 +56,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "PostID", postId));
         this.postRepo.delete(post);
-        // TODO: add logic to remove image when the post is deleted
+        // TODO: add logic to remove image and comments when the post is deleted
     }
 
     @Override
